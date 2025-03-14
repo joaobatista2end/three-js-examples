@@ -28,14 +28,12 @@ const routes = [
   },
 ]
 
-// Configurar título da página quando a rota mudar
 const router = createRouter({
   history: createWebHistory(),
   routes,
 })
 
-router.beforeEach((to, from, next) => {
-  // Atualizar o título do documento
+router.beforeEach((to, _from, next) => {
   document.title = to.meta.title as string || 'Demonstrações Three.js';
   next();
 });
