@@ -4,7 +4,7 @@ import HomePage from '@/pages/home.page.vue'
 import ExampleOnePage from '@/pages/example-one.page.vue'
 
 const routes = [
-  { path: '/', component: HomePage },
+  { path: '/', component: ExampleOnePage },
   { path: '/example-1', component: ExampleOnePage },
 ]
 
