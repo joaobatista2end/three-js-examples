@@ -1,5 +1,9 @@
 <template>
-  <div ref="containerRef" class="three-container" @click="handleMouseClick"></div>
+  <div
+    ref="containerRef"
+    class="relative w-full min-h-full block cursor-grab active:cursor-grabbing"
+    @click="handleMouseClick"
+  ></div>
 </template>
 
 <script lang="ts" setup>
@@ -39,9 +43,12 @@ const changeCubeColor = () => {
 
 const handleMouseClick = (event: MouseEvent) => {
   if (!threeJS.scene.value) return;
-  
-  const intersects = threeJS.setupRaycaster(event, threeJS.scene.value.children);
-  
+
+  const intersects = threeJS.setupRaycaster(
+    event,
+    threeJS.scene.value.children
+  );
+
   if (intersects.length > 0) {
     const intersected = intersects[0].object;
     if (intersected === cube) {
@@ -58,7 +65,7 @@ const animate = () => {
 const initComponent = () => {
   threeJS.container.value = containerRef.value;
   threeJS.initThreeJS();
-  
+
   if (threeJS.camera.value) {
     threeJS.camera.value.aspect = threeJS.width.value / threeJS.height.value;
     threeJS.camera.value.fov = 75;
@@ -67,11 +74,11 @@ const initComponent = () => {
     threeJS.camera.value.position.z = 5;
     threeJS.camera.value.updateProjectionMatrix();
   }
-  
+
   if (threeJS.renderer.value) {
     threeJS.renderer.value.setSize(threeJS.width.value, threeJS.height.value);
   }
-  
+
   createCube();
   threeJS.startAnimation(animate);
 };
@@ -92,12 +99,3 @@ onBeforeUnmount(() => {
   cleanup();
 });
 </script>
-
-<style scoped>
-.three-container {
-  width: 100%;
-  height: 100vh;
-  display: block;
-  position: relative;
-}
-</style>
