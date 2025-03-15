@@ -1,9 +1,8 @@
-import { createWebHistory, createRouter } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
-import HomePage from '@/pages/home.page.vue'
-import ExampleOnePage from '@/pages/example-one.page.vue'
+import ExampleThreePage from '@/pages/example-three.page.vue'
 import ExampleTwoPage from '@/pages/example-two.page.vue'
-
+import HomePage from '@/pages/home.page.vue'
 const routes = [
   { 
     path: '/', 
@@ -13,19 +12,19 @@ const routes = [
     }
   },
   { 
-    path: '/example-1', 
-    component: ExampleOnePage,
-    meta: { 
-      title: 'Cubo Animado - Three.js'
-    }
-  },
-  { 
     path: '/example-2', 
     component: ExampleTwoPage,
     meta: { 
       title: 'Esfera Interativa - Three.js'
     }
   },
+  { 
+    path: '/example-3', 
+    component: ExampleThreePage,
+    meta: { 
+      title: 'Controlando a Rotação e Cor - Three.js'
+    }
+  }
 ]
 
 const router = createRouter({
@@ -39,3 +38,4 @@ router.beforeEach((to, _from, next) => {
 });
 
 export { router }
+
