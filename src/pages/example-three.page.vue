@@ -11,121 +11,103 @@
   >
     <div class="absolute top-4 left-0 w-full">
       <div
-        class="flex border flex-col mt-4 w-fit px-4 mx-auto rounded-lg pb-6 pt-2"
+        class="flex border flex-col mt-4 px-4 mx-auto rounded-lg pb-4 pt-2 max-w-2xl"
         :style="{ 
-              color: `#${color}`,
-              backgroundColor: `#${color}20`,
-              borderColor: `#${color}`
-            }"
+          color: `#${color}`,
+          backgroundColor: `#${color}20`,
+          borderColor: `#${color}`
+        }"
       >
-        <div class="text-white text-sm mb-4">
-          <h3 class="font-bold mb-2">Instruções:</h3>
-          <ul class="list-disc list-inside space-y-1">
-            <li>Use as <span :style="{ color: `#${color}` }">setas do teclado</span> para controlar a rotação do cubo</li>
-            <li>Clique nos botões <span :style="{ color: `#${color}` }">+/-</span> para ajustar a velocidade de rotação</li>
-            <li>Clique no <span :style="{ color: `#${color}` }">cubo</span> ou no botão para mudar sua cor</li>
-          </ul>
-        </div>
-
-        <div class="flex gap-2">
+        <div class="text-white text-sm mb-4 grid grid-cols-2 gap-4">
           <div>
-            <h3 class="text-white text-sm mb-2">Velocity Rotation X</h3>
-            <div class="flex items-center">
-              <button
-                @click="decreaseRotationX"
-                :style="{ 
-                  color: `#${color}`,
-                  backgroundColor: `#${color}20`,
-                  borderColor: `#${color}`
-                }"
-                class="border inline-flex aspect-square text-xl h-8 items-center justify-center font-bold p-2 rounded-l-md cursor-pointer"
-              >
-                -
-              </button>
-              <input
-                type="number"
-                v-model="rotation.x"
-                readonly
-                :style="{ 
-                  color: `#${color}`,
-                  backgroundColor: `#${color}10`,
-                  borderColor: `#${color}`
-                }"
-                class="max-w-[120px] border-y h-8 p-2 px-4 outline-none focus:bg-opacity-20"
-              />
-              <button
-                @click="increaseRotationX"
-                :style="{ 
-                  color: `#${color}`,
-                  backgroundColor: `#${color}20`,
-                  borderColor: `#${color}`
-                }"
-                class="border inline-flex aspect-square text-xl h-8 items-center justify-center font-bold p-2 rounded-r-md cursor-pointer"
-              >
-                +
-              </button>
-            </div>
+            <h3 class="font-bold mb-2">Instruções:</h3>
+            <ul class="list-disc list-inside space-y-1 text-xs">
+              <li>Use as <span :style="{ color: `#${color}` }">setas do teclado</span> para controlar a rotação</li>
+              <li>Clique nos botões <span :style="{ color: `#${color}` }">+/-</span> para ajustar a velocidade</li>
+            </ul>
           </div>
-
-          <div>
-            <h3 class="text-white text-sm mb-2">Velocity Rotation Y</h3>
-            <div class="flex items-center">
-              <button
-                @click="decreaseRotationY"
-                :style="{ 
-                  color: `#${color}`,
-                  backgroundColor: `#${color}20`,
-                  borderColor: `#${color}`
-                }"
-                class="border inline-flex aspect-square text-xl h-8 items-center justify-center font-bold p-2 rounded-l-md cursor-pointer"
+          <div class="flex flex-col">
+            <div class="flex gap-2 items-center mb-2">
+              <button 
+                @click="changeCubeColor" 
+                :style="{ color: `#${color}`, backgroundColor: `#${color}20`, borderColor: `#${color}` }"
+                class="border text-sm h-7 px-3 rounded-md cursor-pointer"
               >
-                -
+                Mudar Cor
               </button>
-              <input
-                type="number"
-                v-model="rotation.y"
-                readonly
-                :style="{ 
-                  color: `#${color}`,
-                  backgroundColor: `#${color}10`,
-                  borderColor: `#${color}`
-                }"
-                class="max-w-[120px] border-y h-8 p-2 px-4 outline-none focus:bg-opacity-20"
-              />
+              <div 
+                class="h-7 w-7 border-2 rounded-full" 
+                :style="{ backgroundColor: `#${color}50`, borderColor: `#${color}` }"
+              ></div>
+            </div>
+            <div class="flex gap-2">
               <button
-                @click="increaseRotationY"
+                v-for="shape in shapes"
+                :key="shape.type"
+                @click="changeShape(shape.type)"
                 :style="{ 
                   color: `#${color}`,
-                  backgroundColor: `#${color}20`,
+                  backgroundColor: currentShape === shape.type ? `#${color}40` : `#${color}20`,
                   borderColor: `#${color}`
                 }"
-                class="border inline-flex aspect-square text-xl h-8 items-center justify-center font-bold p-2 rounded-r-md cursor-pointer"
+                class="border text-sm flex-1 h-7 rounded-md cursor-pointer"
               >
-                +
+                {{ shape.label }}
               </button>
             </div>
           </div>
         </div>
 
-        <div class="mt-4 flex gap-2">
-          <button 
-            @click="changeCubeColor" 
-            :style="{ 
-              color: `#${color}`,
-              backgroundColor: `#${color}20`,
-              borderColor: `#${color}`
-            }"
-            class="border inline-flex font-semibold h-8 items-center justify-center p-2 rounded-md cursor-pointer"
-          >
-            Change Color
-          </button>
-          <div 
-            class="h-8 w-8 border-2 rounded-full" 
-            :style="{ 
-              backgroundColor: `#${color}50`, 
-              borderColor: `#${color}` 
-            }"
-          ></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <div v-for="(_, axis) in rotation" :key="axis" class="flex-1">
+              <div class="text-white text-xs mb-1">Rotation {{ axis.toUpperCase() }}</div>
+              <div class="flex items-center">
+                <button
+                  @click="axis === 'x' ? decreaseRotationX : decreaseRotationY"
+                  :style="{ color: `#${color}`, backgroundColor: `#${color}20`, borderColor: `#${color}` }"
+                  class="border inline-flex h-7 w-7 items-center justify-center font-bold rounded-l-md cursor-pointer"
+                >-</button>
+                <input
+                  type="number"
+                  v-model="rotation[axis]"
+                  readonly
+                  :style="{ color: `#${color}`, backgroundColor: `#${color}10`, borderColor: `#${color}` }"
+                  class="w-16 border-y h-7 px-2 outline-none text-sm"
+                />
+                <button
+                  @click="axis === 'x' ? increaseRotationX : increaseRotationY"
+                  :style="{ color: `#${color}`, backgroundColor: `#${color}20`, borderColor: `#${color}` }"
+                  class="border inline-flex h-7 w-7 items-center justify-center font-bold rounded-r-md cursor-pointer"
+                >+</button>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="showSegmentControls" class="space-y-2">
+            <div v-for="(control, key) in segmentControls" :key="key" class="flex-1">
+              <div class="text-white text-xs mb-1">{{ control?.label }}</div>
+              <div class="flex items-center">
+                <button
+                  @click="updateSegments(key, -1)"
+                  :style="{ color: `#${color}`, backgroundColor: `#${color}20`, borderColor: `#${color}` }"
+                  class="border inline-flex h-7 w-7 items-center justify-center font-bold rounded-l-md cursor-pointer"
+                >-</button>
+                <input
+                  type="number"
+                  v-model="segments[key]"
+                  readonly
+                  :style="{ color: `#${color}`, backgroundColor: `#${color}10`, borderColor: `#${color}` }"
+                  class="w-16 border-y h-7 px-2 outline-none text-sm"
+                />
+                <button
+                  @click="updateSegments(key, 1)"
+                  :style="{ color: `#${color}`, backgroundColor: `#${color}20`, borderColor: `#${color}` }"
+                  class="border inline-flex h-7 w-7 items-center justify-center font-bold rounded-r-md cursor-pointer"
+                >+</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -134,7 +116,8 @@
 
 <script lang="ts" setup>
 import * as THREE from 'three';
-import { defineComponent, markRaw, onBeforeUnmount, onMounted, ref } from 'vue';
+import { BoxGeometry, ConeGeometry, CylinderGeometry, SphereGeometry } from 'three';
+import { computed, defineComponent, markRaw, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useThreeJS } from '../composables/useThreeJS';
 
 defineComponent({
@@ -143,14 +126,140 @@ defineComponent({
 
 const containerRef = ref<HTMLDivElement | null>(null);
 const threeJS = useThreeJS();
-let cube: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
+let cube: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
 const rotation = ref<{ x: number; y: number }>({ x: 0.01, y: 0.01 });
 const color = ref<string>('53eafd');
+const currentShape = ref('box');
+const segments = ref({
+  width: 1,
+  height: 1,
+  depth: 1,
+  radius: 1,
+  widthSegments: 32,
+  heightSegments: 32,
+  radialSegments: 32
+});
+
+const shapes = [
+  { type: 'box', label: 'Cubo' },
+  { type: 'sphere', label: 'Esfera' },
+  { type: 'cylinder', label: 'Cilindro' },
+  { type: 'cone', label: 'Cone' }
+];
+
+const segmentControls = computed(() => {
+  switch (currentShape.value) {
+    case 'box':
+      return {
+        width: { label: 'Largura' },
+        height: { label: 'Altura' },
+        depth: { label: 'Profundidade' }
+      } as const;
+    case 'sphere':
+      return {
+        widthSegments: { label: 'Segmentos H' },
+        heightSegments: { label: 'Segmentos V' }
+      } as const;
+    case 'cylinder':
+    case 'cone':
+      return {
+        radialSegments: { label: 'Segmentos R' },
+        heightSegments: { label: 'Segmentos H' }
+      } as const;
+    default:
+      return {} as const;
+  }
+});
+
+const showSegmentControls = computed(() => Object.keys(segmentControls.value).length > 0);
+
+const updateSegments = (key: string, delta: number) => {
+  segments.value[key] = Math.max(1, segments.value[key] + delta);
+  updateGeometry();
+};
+
+const changeShape = (shape: string) => {
+  currentShape.value = shape;
+  
+  // Reset segments based on shape type
+  switch (shape) {
+    case 'box':
+      segments.value = {
+        ...segments.value,
+        width: 1,
+        height: 1,
+        depth: 1
+      };
+      break;
+    case 'sphere':
+      segments.value = {
+        ...segments.value,
+        radius: 1,
+        widthSegments: 32,
+        heightSegments: 32
+      };
+      break;
+    case 'cylinder':
+    case 'cone':
+      segments.value = {
+        ...segments.value,
+        radius: 1,
+        radialSegments: 32,
+        heightSegments: 1
+      };
+      break;
+  }
+  
+  updateGeometry();
+};
+
+const createGeometry = () => {
+  switch (currentShape.value) {
+    case 'box':
+      return new BoxGeometry(
+        segments.value.width,
+        segments.value.height,
+        segments.value.depth
+      );
+    case 'sphere':
+      return new SphereGeometry(
+        segments.value.radius,
+        segments.value.widthSegments,
+        segments.value.heightSegments
+      );
+    case 'cylinder':
+      return new CylinderGeometry(
+        segments.value.radius,
+        segments.value.radius,
+        2,
+        segments.value.radialSegments,
+        segments.value.heightSegments
+      );
+    case 'cone':
+      return new ConeGeometry(
+        segments.value.radius,
+        2,
+        segments.value.radialSegments,
+        segments.value.heightSegments
+      );
+    default:
+      return new BoxGeometry();
+  }
+};
+
+const updateGeometry = () => {
+  if (!cube || !threeJS.scene.value) return;
+  
+  const newGeometry = createGeometry();
+  cube.geometry.dispose();
+  cube.geometry = newGeometry;
+};
+
 const createCube = () => {
   if (!threeJS.scene.value) return;
-  const geometry = markRaw(new THREE.BoxGeometry());
+  const geometry = markRaw(createGeometry());
   const material = markRaw(
-    new THREE.MeshBasicMaterial({ wireframe: true, color: '#53eafd' })
+    new THREE.MeshBasicMaterial({ wireframe: true, color: `#${color.value}` })
   );
   cube = markRaw(new THREE.Mesh(geometry, material));
   threeJS.scene.value.add(cube);
