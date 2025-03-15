@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'node:path'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,6 +9,17 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
+    }
+  },
+  build: {
+    chunkSizeWarningLimit: 1000, // Size in kB
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'three-vendor': ['three'],
+          'three-examples': ['three/examples/jsm/geometries/TextGeometry', 'three/examples/jsm/loaders/FontLoader']
+        }
+      }
     }
   }
 })

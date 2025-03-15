@@ -89,19 +89,19 @@
               <div class="text-white text-xs mb-1">{{ control?.label }}</div>
               <div class="flex items-center">
                 <button
-                  @click="updateSegments(key, -1)"
+                  @click="updateSegments(key as keyof Segments, -1)"
                   :style="{ color: `#${color}`, backgroundColor: `#${color}20`, borderColor: `#${color}` }"
                   class="border inline-flex h-7 w-7 items-center justify-center font-bold rounded-l-md cursor-pointer"
                 >-</button>
                 <input
                   type="number"
-                  v-model="segments[key]"
+                  v-model="segments[key as keyof Segments]"
                   readonly
                   :style="{ color: `#${color}`, backgroundColor: `#${color}10`, borderColor: `#${color}` }"
                   class="w-16 border-y h-7 px-2 outline-none text-sm"
                 />
                 <button
-                  @click="updateSegments(key, 1)"
+                  @click="updateSegments(key as keyof Segments, 1)"
                   :style="{ color: `#${color}`, backgroundColor: `#${color}20`, borderColor: `#${color}` }"
                   class="border inline-flex h-7 w-7 items-center justify-center font-bold rounded-r-md cursor-pointer"
                 >+</button>
@@ -130,7 +130,18 @@ let cube: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
 const rotation = ref<{ x: number; y: number }>({ x: 0.01, y: 0.01 });
 const color = ref<string>('53eafd');
 const currentShape = ref('box');
-const segments = ref({
+
+type Segments = {
+  width: number;
+  height: number;
+  depth: number;
+  radius: number;
+  widthSegments: number;
+  heightSegments: number;
+  radialSegments: number;
+};
+
+const segments = ref<Segments>({
   width: 1,
   height: 1,
   depth: 1,
@@ -173,7 +184,7 @@ const segmentControls = computed(() => {
 
 const showSegmentControls = computed(() => Object.keys(segmentControls.value).length > 0);
 
-const updateSegments = (key: string, delta: number) => {
+const updateSegments = (key: keyof Segments, delta: number) => {
   segments.value[key] = Math.max(1, segments.value[key] + delta);
   updateGeometry();
 };
