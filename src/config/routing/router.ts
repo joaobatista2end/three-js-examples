@@ -4,6 +4,7 @@ import ExampleThreePage from '@/pages/example-three.page.vue'
 import ExampleTwoPage from '@/pages/example-two.page.vue'
 import HomePage from '@/pages/home.page.vue'
 import ExampleFourPage from '../../pages/example-four.page.vue'
+import FullScreen from '../../pages/layout/FullScreen.vue'
 const routes = [
   { 
     path: '/', 
@@ -28,10 +29,16 @@ const routes = [
   },
   {
     path: '/example-4', 
-    component: ExampleFourPage,
-    meta: { 
-      title: 'Colisão - Three.js'
-    }
+    component: FullScreen,
+    children: [
+      {
+        path: '',
+        component: ExampleFourPage,
+        meta: { 
+          title: 'Colisão - Three.js'
+        }
+      }
+    ]
   }
 ]
 
