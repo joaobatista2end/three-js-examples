@@ -74,8 +74,8 @@ export class SoccerField {
 
   private createGoals() {
     // Create goals on both sides
-    const goalLeft = new Goal(new THREE.Vector3(-15, 0, 0));
-    const goalRight = new Goal(new THREE.Vector3(15, 0, 0));
+    const goalLeft = new Goal(new THREE.Vector3(-14.5, 0, 0));
+    const goalRight = new Goal(new THREE.Vector3(14.5, 0, 0));
     
     // Rotate goals to face each other
     goalLeft.getMesh().rotation.y = degrees(-90); // Rotate left goal 90 degrees counterclockwise

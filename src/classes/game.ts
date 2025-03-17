@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Ball } from './ball';
 import { SoccerField } from './soccerfield';
 
 export class Game {
@@ -8,6 +9,7 @@ export class Game {
     private renderer: THREE.WebGLRenderer;
     private controls: OrbitControls;
     private soccerField: SoccerField;
+    private ball: Ball;
     
     constructor(container: HTMLElement) {
         // Initialize scene
@@ -65,6 +67,13 @@ export class Game {
         this.soccerField = new SoccerField();
         this.scene.add(this.soccerField.getMesh());
         
+        // Create ball
+        this.ball = new Ball();
+        this.ball.onLoad(() => {
+            this.ball.setPosition(0, 0.2, 0);
+            this.scene.add(this.ball.getMesh());
+        });
+        
         // Handle window resize
         window.addEventListener('resize', this.onWindowResize.bind(this));
     }
@@ -79,6 +88,9 @@ export class Game {
     }
     
     public update(): void {
+        // Update ball physics
+        this.ball.update();
+        
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }

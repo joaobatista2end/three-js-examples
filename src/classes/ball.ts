@@ -1,52 +1,86 @@
 import * as THREE from 'three';
-import { TimeService } from './time';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 export class Ball {
     private readonly FRICTION = 0.9;
+    private readonly ROTATION_FACTOR = 5; // How much the ball rotates based on velocity
     private velocity: THREE.Vector3;
-    private mesh: THREE.Mesh;
     private container: THREE.Object3D;
+    private loaded: boolean = false;
+    private onLoadCallback?: () => void;
 
     constructor() {
         this.velocity = new THREE.Vector3(0, 0, 0);
         this.container = new THREE.Object3D();
-        
-        // Create ball mesh
-        const geometry = new THREE.SphereGeometry(0.2, 32, 32);
-        const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
-        this.mesh = new THREE.Mesh(geometry, material);
-        this.mesh.castShadow = true;
-        this.mesh.receiveShadow = true;
-        this.mesh.position.y = 0.2;
-        
-        this.container.add(this.mesh);
+        this.loadBallModel();
+    }
+
+    private loadBallModel(): void {
+        const objLoader = new OBJLoader();
+        objLoader.load(
+            '/src/assets/ball.obj',
+            (object) => {
+                object.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+
+                        if (!child.material) {
+                            child.material = new THREE.MeshStandardMaterial({ 
+                                color: 0xffffff 
+                            });
+                        }
+                    }
+                });
+                
+                object.scale.set(0.2, 0.2, 0.2);
+                this.container.add(object);
+                this.loaded = true;
+                if (this.onLoadCallback) {
+                    this.onLoadCallback();
+                }
+            },
+         
+        );
     }
     
-    update() {
-        // Apply friction
+    update(): void {
         this.velocity.multiplyScalar(this.FRICTION);
         
-        // Update position
-        const deltaMove = this.velocity.clone().multiplyScalar(TimeService.deltaTime);
+        const deltaMove = this.velocity.clone();
         const newPosition = this.container.position.clone().add(deltaMove);
         this.container.position.copy(newPosition);
+
+        if (this.velocity.lengthSq() > 0.0001) {
+            const speed = this.velocity.length();
+            const rotationAxis = new THREE.Vector3(-this.velocity.z, 0, this.velocity.x).normalize();
+            this.container.rotateOnAxis(rotationAxis, speed * this.ROTATION_FACTOR);
+        }
     }
     
     public getMesh(): THREE.Object3D {
         return this.container;
     }
     
-    public getPosition(): THREE.Vector2 {
-        return new THREE.Vector2(this.container.position.x, this.container.position.z);
+    public getPosition(): THREE.Vector3 {
+        return this.container.position.clone();
     }
     
-    public setPosition(x: number, z: number): void {
-        this.container.position.set(x, 0, z);
+    public setPosition(x: number, y: number, z: number): void {
+        this.container.position.set(x, y, z);
         this.velocity.set(0, 0, 0);
     }
     
     public addToVelocity(force: THREE.Vector2): void {
         this.velocity.x += force.x;
         this.velocity.z += force.y;
+    }
+
+    public onLoad(callback: () => void): void {
+        if (this.loaded) {
+            callback();
+        } else {
+            this.onLoadCallback = callback;
+        }
     }
 }
