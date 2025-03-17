@@ -8,7 +8,7 @@
         <li><router-link to="/" class="font-light hover:underline">Início</router-link></li>
         <li><router-link to="/example-3" class="font-light hover:underline">Controlando a Rotação e Cor</router-link></li>
         <li><router-link to="/example-2" class="font-light hover:underline">Texturas e Segmentos</router-link></li>
- 
+        <li><router-link to="/example-4" class="font-light hover:underline">Colisão</router-link></li>
       </ul>
     </div>
 

@@ -7,11 +7,12 @@
     >
     </div>
     
-    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-lg">
-      <p>Controles da câmera:</p>
-      <p>Arrastar - Girar câmera</p>
-      <p>Roda do mouse - Zoom</p>
-    </div>
+    <ul class="absolute top-0 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-6 py-2 rounded-b-lg text-xs list-disc">
+      <li>Arrastar - Girar câmera</li>
+      <li>Scroll - Zoom da câmera</li>
+      <li> Setas - Mover jogador</li>
+      <li>Espaço - Chutar</li>
+    </ul>
   </div>
 </template>
 
