@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Ball } from './ball';
+import { Player } from './player';
 import { SoccerField } from './soccerfield';
 
 export class Game {
@@ -10,8 +11,18 @@ export class Game {
     private controls: OrbitControls;
     private soccerField: SoccerField;
     private ball: Ball;
+    private player: Player;
+    private keys: { [key: string]: boolean } = {};
+    private boundHandleKeyDown: (event: KeyboardEvent) => void;
+    private boundHandleKeyUp: (event: KeyboardEvent) => void;
+    private boundHandleResize: () => void;
     
     constructor(container: HTMLElement) {
+        // Initialize event handlers
+        this.boundHandleKeyDown = this.handleKeyDown.bind(this);
+        this.boundHandleKeyUp = this.handleKeyUp.bind(this);
+        this.boundHandleResize = this.onWindowResize.bind(this);
+
         // Initialize scene
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x87ceeb); // Sky blue background
@@ -73,9 +84,51 @@ export class Game {
             this.ball.setPosition(0, 0.2, 0);
             this.scene.add(this.ball.getMesh());
         });
+
+        // Create player
+        this.player = new Player();
+        this.player.setPosition(-5, 0);
+        this.scene.add(this.player.getMesh());
+        
+        // Setup input handlers
+        this.setupInputHandlers();
         
         // Handle window resize
-        window.addEventListener('resize', this.onWindowResize.bind(this));
+        window.addEventListener('resize', this.boundHandleResize);
+    }
+    
+    private setupInputHandlers(): void {
+        window.addEventListener('keydown', this.boundHandleKeyDown);
+        window.addEventListener('keyup', this.boundHandleKeyUp);
+    }
+
+    private handleKeyDown(event: KeyboardEvent): void {
+        this.keys[event.code] = true;
+        
+        if (event.code === 'Space' && !event.repeat) {
+            this.player.startKick();
+        }
+    }
+
+    private handleKeyUp(event: KeyboardEvent): void {
+        this.keys[event.code] = false;
+        
+        if (event.code === 'Space') {
+            this.player.endKick(this.ball);
+        }
+    }
+    
+    private handleInput(): void {
+        const direction = new THREE.Vector2(0, 0);
+        
+        if (this.keys['KeyW'] || this.keys['ArrowUp']) direction.y -= 1;
+        if (this.keys['KeyS'] || this.keys['ArrowDown']) direction.y += 1;
+        if (this.keys['KeyA'] || this.keys['ArrowLeft']) direction.x -= 1;
+        if (this.keys['KeyD'] || this.keys['ArrowRight']) direction.x += 1;
+        
+        if (direction.lengthSq() > 0) {
+            this.player.move(direction);
+        }
     }
     
     private onWindowResize(): void {
@@ -88,15 +141,28 @@ export class Game {
     }
     
     public update(): void {
-        // Update ball physics
+        this.handleInput();
+        
+        // Update game objects
         this.ball.update();
+        this.player.update(this.ball);
+        
+        // Check for goals
+        const goalMessage = this.soccerField.checkGoals(this.ball.getPosition());
+        if (goalMessage) {
+            console.log(goalMessage);
+            // Reset ball position after goal
+            this.ball.setPosition(0, 0.2, 0);
+        }
         
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
     
     public dispose(): void {
-        window.removeEventListener('resize', this.onWindowResize.bind(this));
+        window.removeEventListener('resize', this.boundHandleResize);
+        window.removeEventListener('keydown', this.boundHandleKeyDown);
+        window.removeEventListener('keyup', this.boundHandleKeyUp);
         this.renderer.dispose();
         this.controls.dispose();
     }
